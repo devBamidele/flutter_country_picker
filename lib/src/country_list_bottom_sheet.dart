@@ -20,6 +20,7 @@ void showCountryListBottomSheet({
   bool useSafeArea = false,
   bool useRootNavigator = false,
   bool moveAlongWithKeyboard = false,
+  Widget? header,
 }) {
   showModalBottomSheet(
     context: context,
@@ -40,6 +41,7 @@ void showCountryListBottomSheet({
       showSearch,
       moveAlongWithKeyboard,
       customFlagBuilder,
+      header,
     ),
   ).whenComplete(() {
     if (onClosed != null) onClosed();
@@ -59,13 +61,16 @@ Widget _builder(
   bool showSearch,
   bool moveAlongWithKeyboard,
   CustomFlagBuilder? customFlagBuilder,
+  Widget? header,
 ) {
   final device = MediaQuery.of(context).size.height;
   final statusBarHeight = MediaQuery.of(context).padding.top;
-  final height = countryListTheme?.bottomSheetHeight ?? device - (statusBarHeight + (kToolbarHeight / 1.5));
+  final height = countryListTheme?.bottomSheetHeight ??
+      device - (statusBarHeight + (kToolbarHeight / 1.5));
   final width = countryListTheme?.bottomSheetWidth;
 
-  Color? _backgroundColor = countryListTheme?.backgroundColor ?? Theme.of(context).bottomSheetTheme.backgroundColor;
+  Color? _backgroundColor = countryListTheme?.backgroundColor ??
+      Theme.of(context).bottomSheetTheme.backgroundColor;
 
   if (_backgroundColor == null) {
     if (Theme.of(context).brightness == Brightness.light) {
@@ -82,11 +87,12 @@ Widget _builder(
       );
 
   return Padding(
-    padding: moveAlongWithKeyboard ? MediaQuery.of(context).viewInsets : EdgeInsets.zero,
+    padding: moveAlongWithKeyboard
+        ? MediaQuery.of(context).viewInsets
+        : EdgeInsets.zero,
     child: Container(
       height: height,
       width: width,
-      padding: countryListTheme?.padding,
       margin: countryListTheme?.margin,
       decoration: BoxDecoration(
         color: _backgroundColor,
@@ -103,7 +109,18 @@ Widget _builder(
         showWorldWide: showWorldWide,
         showSearch: showSearch,
         customFlagBuilder: customFlagBuilder,
+        header: header,
       ),
     ),
   );
+}
+
+List<Widget> headerTitle(Widget title) {
+  return [
+    title,
+    const Divider(
+      color: Color(0xFFD9D9D9),
+      height: 0,
+    ),
+  ];
 }

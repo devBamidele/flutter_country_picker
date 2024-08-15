@@ -48,6 +48,8 @@ class CountryListView extends StatefulWidget {
   /// Custom builder function for flag widget
   final CustomFlagBuilder? customFlagBuilder;
 
+  final Widget? header;
+
   const CountryListView({
     Key? key,
     required this.onSelect,
@@ -60,10 +62,11 @@ class CountryListView extends StatefulWidget {
     this.showWorldWide = false,
     this.showSearch = true,
     this.customFlagBuilder,
+    this.header,
   })  : assert(
-  exclude == null || countryFilter == null,
-  'Cannot provide both exclude and countryFilter',
-  ),
+          exclude == null || countryFilter == null,
+          'Cannot provide both exclude and countryFilter',
+        ),
         super(key: key);
 
   @override
@@ -101,13 +104,13 @@ class _CountryListViewState extends State<CountryListView> {
 
     if (widget.exclude != null) {
       _countryList.removeWhere(
-            (element) => widget.exclude!.contains(element.countryCode),
+        (element) => widget.exclude!.contains(element.countryCode),
       );
     }
 
     if (widget.countryFilter != null) {
       _countryList.removeWhere(
-            (element) => !widget.countryFilter!.contains(element.countryCode),
+        (element) => !widget.countryFilter!.contains(element.countryCode),
       );
     }
 
@@ -128,6 +131,7 @@ class _CountryListViewState extends State<CountryListView> {
 
     return Column(
       children: <Widget>[
+        if (widget.header != null) ...headerTitle(widget.header!),
         const SizedBox(height: 12),
         if (widget.showSearch)
           Padding(
@@ -136,7 +140,7 @@ class _CountryListViewState extends State<CountryListView> {
               autofocus: _searchAutofocus,
               controller: _searchController,
               style:
-              widget.countryListTheme?.searchTextStyle ?? _defaultTextStyle,
+                  widget.countryListTheme?.searchTextStyle ?? _defaultTextStyle,
               decoration: widget.countryListTheme?.inputDecoration ??
                   InputDecoration(
                     labelText: searchLabel,
@@ -219,8 +223,8 @@ class _CountryListViewState extends State<CountryListView> {
               Expanded(
                 child: Text(
                   CountryLocalizations.of(context)
-                      ?.countryName(countryCode: country.countryCode)
-                      ?.replaceAll(RegExp(r"\s+"), " ") ??
+                          ?.countryName(countryCode: country.countryCode)
+                          ?.replaceAll(RegExp(r"\s+"), " ") ??
                       country.name,
                   style: _textStyle,
                 ),
@@ -242,19 +246,29 @@ class _CountryListViewState extends State<CountryListView> {
   }
 
   Widget _emojiText(Country country) => Text(
-    country.iswWorldWide
-        ? '\uD83C\uDF0D'
-        : Utils.countryCodeToEmoji(country.countryCode),
-    style: TextStyle(
-      fontSize: widget.countryListTheme?.flagSize ?? 25,
-      fontFamilyFallback: widget.countryListTheme?.emojiFontFamilyFallback,
-    ),
-  );
+        country.iswWorldWide
+            ? '\uD83C\uDF0D'
+            : Utils.countryCodeToEmoji(country.countryCode),
+        style: TextStyle(
+          fontSize: widget.countryListTheme?.flagSize ?? 25,
+          fontFamilyFallback: widget.countryListTheme?.emojiFontFamilyFallback,
+        ),
+      );
+
+  List<Widget> headerTitle(Widget title) {
+    return [
+      title,
+      const Divider(
+        color: Color(0xFFD9D9D9),
+        height: 0,
+      ),
+    ];
+  }
 
   void _filterSearchResults(String query) {
     List<Country> _searchResult = <Country>[];
     final CountryLocalizations? localizations =
-    CountryLocalizations.of(context);
+        CountryLocalizations.of(context);
 
     if (query.isEmpty) {
       _searchResult.addAll(_countryList);
